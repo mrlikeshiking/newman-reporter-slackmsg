@@ -1,11 +1,11 @@
 const prettyms = require('pretty-ms');
 const axios = require('axios').default;
 var jsonminify = require("jsonminify");
-
+​
 let messageSize;
-
+​
 // creates message for slack
-function slackMessage(stats, timings, failures, executions, maxMessageSize, collection, environment, channel, reportingUrl) {
+function slackMessage(stats, timings, failures, executions, maxMessageSize, collection, environment, channel) {
     messageSize = maxMessageSize;
     let parsedFailures = parseFailures(failures);
     let skipCount = getSkipCount(executions);
@@ -42,10 +42,6 @@ function slackMessage(stats, timings, failures, executions, maxMessageSize, coll
                 "type": "divider"
             },
             ${collectionAndEnvironentFileBlock(collection, environment)}
-            ${reportingUrlSection(reportingUrl)}
-            {
-                "type": "divider"
-            },
             {
                 "type": "section",
                 "text": {
@@ -118,7 +114,7 @@ function slackMessage(stats, timings, failures, executions, maxMessageSize, coll
         ${failures.length > 0 ? failureMessage : successMessage}
        }`);
 }
-
+​
 function collectionAndEnvironentFileBlock(collection, environment) {
     if (collection) {
         return `{
@@ -131,20 +127,7 @@ function collectionAndEnvironentFileBlock(collection, environment) {
     }
     return '';
 }
-
-function reportingUrlSection(reportingUrl) {
-    if (reportingUrl) {
-        return `{
-            "type": "section",
-			"text": {
-				"type": "mrkdwn",
-				"text": "Reporting URL: ${reportingUrl}"
-			}
-        }, `
-    }
-    return '';
-}
-
+​
 function getSkipCount(executions) {
     return executions.reduce((acc, execution) => {
         if (execution.assertions) {
@@ -155,8 +138,8 @@ function getSkipCount(executions) {
         return acc;
     }, 0);
 }
-
-
+​
+​
 // Takes fail report and parse it for further processing
 function parseFailures(failures) {
     return failures.reduce((acc, failure, index) => {
@@ -188,23 +171,24 @@ function parseFailures(failures) {
         return acc;
     }, []);
 }
-
+​
 // Takes parsedFailures and create failMessages
 function failMessage(parsedFailures) {
-    return parsedFailures.map((failure) => {
-        return `
+    return parsedFailures.reduce((acc, failure) => {
+        acc = acc + `
         {
             "title": "${failure.name}",
             "short": false
         },
-        ${failErrors(failure.tests)}`;
-    }).join();
+        ${failErrors(failure.tests)}`
+        return acc;
+    }, '');
 }
-
+​
 // Takes failMessages and create Error messages for each failures
 function failErrors(parsedErrors) {
-    return parsedErrors.map((error, index) => {
-        return `
+    return parsedErrors.reduce((acc, error, index) => {
+        acc = acc + `
         {
             "value": "*\`${index + 1}. ${error.name} - ${error.test}\`*",
             "short": false
@@ -212,10 +196,11 @@ function failErrors(parsedErrors) {
         {
             "value": "• ${cleanErrorMessage(error.message, messageSize)}",
             "short": false
-        }`;
-    }).join();
+        },`;
+        return acc;
+    }, '');
 }
-
+​
 function cleanErrorMessage(message, maxMessageSize) {
     // replaces the quotes and double quotes in order for the message to be valid json format
     // as well as cutting messages to size 100 and truncating it with ...
@@ -226,10 +211,20 @@ function cleanErrorMessage(message, maxMessageSize) {
     }
     return filteredMessage;
 }
-
-
+​
 // sends the message to slack via POST to webhook url
 async function send(url, message, token) {
+	
+	message = message.replace(/\,(?!\s*?[\{\[\"\'\w])/g, '');
+	
+	console.log("Sending newman slack results.");
+	console.log("URL");
+	console.log(url);
+	console.log("Message");
+	console.log(message);
+	console.log("Token");
+	console.log(token);
+	
     const payload = {
         method: 'POST',
         url,
@@ -248,7 +243,7 @@ async function send(url, message, token) {
     }
     return result;
 }
-
+​
 exports.slackUtils = {
     send,
     slackMessage
