@@ -1,4 +1,4 @@
-# newman-reporter-slackmsg
+# newman-reporter-slackshooter
 
 Custom [Newman](https://github.com/postmanlabs/newman) reporter to send message to [Slack](https://slack.com/)
 
@@ -12,28 +12,28 @@ or
 
 ## Installation
  ```CLI
- npm i -g newman-reporter-slackmsg
+ npm i -g newman-reporter-slackshooter
  ```
 
 ## Usage
 ```CLI
- newman run <collectionFile> -e <environmentFile> --suppress-exit-code -r slackmsg --reporter-slackmsg-webhookurl '<webhookurl>'
+ newman run <collectionFile> -e <environmentFile> --suppress-exit-code -r slackshooter --reporter-slackshooter-webhookurl '<webhookurl>'
 ```
 
 ## Usage with channel override bot
 ```CLI
- newman run <collectionFile> -e <environmentFile> --suppress-exit-code -r slackmsg --reporter-slackmsg-webhookurl '<https://slack.com/api/chat.postMessage>' --reporter-slackmsg-token '<bearer token>' --reporter-slackmsg-channel '<channel or userid>'
+ newman run <collectionFile> -e <environmentFile> --suppress-exit-code -r slackshooter --reporter-slackshooter-webhookurl '<https://slack.com/api/chat.postMessage>' --reporter-slackshooter-token '<bearer token>' --reporter-slackshooter-channel '<channel or userid>'
 ```
 
 ## Reporter Options Optionals
 ```
- --reporter-slackmsg-messageSize '<messageSize>' e.g 150
- --reporter-slackmsg-token '<bearer token>' e.g xoxb-XXXXXXXXXXXX-TTTTTTTTTTTTTT
- --reporter-slackmsg-channel '<channel>' e.g #general
- --reporter-slackmsg-failuresChannel '<channel>' e.g. #alerts
- --reporter-slackmsg-collection '<collectionName> e.g test.json
- --reporter-slackmsg-environment '<environmentName> e.g env.json
- --reporter-slackmsg-reportingurl '<URL> e.g https://127.0.1/index.html
+ --reporter-slackshooter-messageSize '<messageSize>' e.g 150
+ --reporter-slackshooter-token '<bearer token>' e.g xoxb-XXXXXXXXXXXX-TTTTTTTTTTTTTT
+ --reporter-slackshooter-channel '<channel>' e.g #general
+ --reporter-slackshooter-failuresChannel '<channel>' e.g. #alerts
+ --reporter-slackshooter-collection '<collectionName> e.g test.json
+ --reporter-slackshooter-environment '<environmentName> e.g env.json
+ --reporter-slackshooter-reportingurl '<URL> e.g https://127.0.1/index.html
 
 ```
 
